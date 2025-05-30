@@ -1,19 +1,25 @@
-import multiprocessing as mp
+import multiprocessing
 
-def demoFunc(targetDict):
-    targetDict[1] = '1'
-    targetDict['2'] = 2
-    targetDict['a'] = 'a'
-#словарь должен быть в глобальной области
+def worker(shared_dict, key, value):
+    """Функция для обновления общего словаря."""
+    shared_dict[key] = value
 
+if __name__ == "__main__":
+    with multiprocessing.Manager() as manager:
+        shared_dict = manager.dict()  # Создаем общий словарь
 
-if __name__ == '__main__':
-    with mp.Manager() as manager:
-        myDict = manager.dict()
+        processes = []
+        data = [("a", 1), ("b", 2), ("c", 3), ("d", 4)]  # Данные для загрузки
 
+        # Создаем и запускаем процессы
+        for key, value in data:
+            a = multiprocessing.Process(target=worker, args=(shared_dict, key, value))
+            processes.append(a)
+            a.start()
 
-        p = mp.Process(target=demoFunc, args=(myDict,))
-        p.start()
-        p.join()
+        # Ожидаем завершения всех процессов
+        for a in processes:
+            a.join()
 
-        print(myDict)
+        # Выводим итоговый общий словарь
+        print("Общий словарь:", dict(shared_dict))
