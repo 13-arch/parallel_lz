@@ -5,7 +5,7 @@ from time import sleep, time
 event = Event()
 
 
-def worker_1(name: str):   
+def worker(name: str):   
    event.wait()
    print(f"Worker: {name}")
 
@@ -13,7 +13,7 @@ def worker_1(name: str):
 event.clear()
 
 
-workers = [Thread(target=worker_1, args=(f"potok {i}",)) for i in range(10)]
+workers = [Thread(target=worker, args=(f"potok {i}",)) for i in range(10)]
 for w in workers:
    w.start()
 
